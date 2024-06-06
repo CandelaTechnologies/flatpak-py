@@ -1,0 +1,69 @@
+{
+  "app-id": "com.candelatech.py3-10",
+  "runtime": "org.freedesktop.Platform",
+  "runtime-version": "23.08",
+  "sdk": "org.freedesktop.Sdk",
+  "command": "ctpy.bash",
+  "modules": [
+    {
+      "name": "openssl",
+      "buildsystem": "simple",
+      "sources": [
+        {
+          "type": "archive",
+          "//url": "https://www.openssl.org/source/openssl-3.0.13.tar.gz",
+          "//sha256": "88525753f79d3bec27d2fa7c66aa0b92b3aa9498dafd93d7cfa4b3780cdae313",
+          "url": "https://www.openssl.org/source/openssl-3.3.1.tar.gz",
+          "sha256": "777cd596284c883375a2a7a11bf5d2786fc5413255efab20c50d6ffe6d020b7e"
+        }
+      ],
+      "build-commands": [
+        "./config enable-md2 shared --prefix=/app --libdir=lib --openssldir=/etc/pki/tls",
+        "make -j1 depend",
+        "make -j$(nproc)",
+        "make install_sw"
+      ]
+    },
+    {
+      "name": "cpython",
+      "buildsystem": "simple",
+      "sources": [
+        {
+          "type": "archive",
+          "url": "https://www.python.org/ftp/python/3.10.14/Python-3.10.14.tar.xz",
+          "md5": "05148354ce821ba7369e5b7958435400"
+        }
+      ],
+      "build-commands": [
+        "LDFLAGS=\"-L/app/lib/openssl\" LD_LIBRARY_PATH=\"/app/lib:/app/lib64\" CPPFLAGS=\"-I/app/include -I/app/include/openssl\" ./configure --with-ensurepip --enable-optimizations --prefix=/app --with-openssl=/app/lib/openssl --with-openssl-rpath=auto",
+        "make -j$(nproc)",
+        "make install"
+      ]
+    },
+    "requirements.wheel.json",
+    "requirements.0.json",
+    "requirements.1.json",
+    "requirements.numpy.json",
+    "requirements.9.json",
+    {
+      "name": "ignore-me",
+      "//": [
+          "//"
+      ]
+    },
+    {
+      "name": "ctpy",
+      "buildsystem": "simple",
+      "build-commands": [
+        "install -D ctpy.bash /app/bin/ctpy.bash"
+      ],
+      "sources": [
+        {
+          "type": "file",
+          "path": "ctpy.bash"
+        }
+      ]
+    }
+  ]
+}
+

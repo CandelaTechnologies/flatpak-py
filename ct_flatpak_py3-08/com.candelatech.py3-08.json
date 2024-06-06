@@ -1,0 +1,73 @@
+{
+  "app-id": "com.candelatech.py3-08",
+  "runtime": "org.freedesktop.Platform",
+  "runtime-version": "21.08",
+  "sdk": "org.freedesktop.Sdk",
+  "command": "ctpy.bash",
+  "modules": [
+    {
+      "name": "openssl",
+      "buildsystem": "simple",
+      "sources": [
+        {
+          "type": "archive",
+          "url": "https://www.openssl.org/source/openssl-3.0.13.tar.gz",
+          "sha256": "88525753f79d3bec27d2fa7c66aa0b92b3aa9498dafd93d7cfa4b3780cdae313"
+        }
+      ],
+      "build-commands": [
+        "./config enable-md2 shared --prefix=/app --libdir=lib --openssldir=/etc/pki/tls",
+        "make -j1 depend",
+        "make -j$(nproc)",
+        "make install_sw"
+      ],
+      "//": {
+        "note": "you can force a build to stop with command, \"exit 1\""
+      }
+    },
+    {
+      "name": "python",
+      "buildsystem": "simple",
+      "sources": [
+        {
+          "type": "archive",
+          "url": "https://www.python.org/ftp/python/3.8.19/Python-3.8.19.tar.xz",
+          "md5": "2532d25930266546822c144b99652254"
+        }
+      ],
+      "build-options": {
+        "prepend-ld-library-path":"/app/lib/openssl"
+      },
+      "build-commands": [
+        "LDFLAGS=\"-L/app/lib/openssl\" LD_LIBRARY_PATH=\"/app/lib:/app/lib64\" CPPFLAGS=\"-I/app/include -I/app/include/openssl\" ./configure --with-ensurepip --enable-optimizations --prefix=/app --with-openssl=/app/lib/openssl --with-openssl-rpath=auto",
+        "make -j$(nproc)",
+        "make install"
+      ]
+    },
+    "requirements.wheel.json",
+    "requirements.0.json",
+    "requirements.1.json",
+    "requirements.numpy.json",
+    "requirements.9.json",
+    {
+      "name": "ignore-me",
+      "//": [
+          "//"
+      ]
+    },
+    {
+      "name": "ctpy",
+      "buildsystem": "simple",
+      "build-commands": [
+        "install -D ctpy.bash /app/bin/ctpy.bash"
+      ],
+      "sources": [
+        {
+          "type": "file",
+          "path": "ctpy.bash"
+        }
+      ]
+    }
+  ]
+}
+
